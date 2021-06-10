@@ -1,5 +1,5 @@
 import { Document } from 'mongoose'
-export interface ITODO extends Document {
+export interface ITodo extends Document {
     name: string
     description: string
     status: boolean
