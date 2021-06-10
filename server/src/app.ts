@@ -1,26 +1,42 @@
-import express, { Express } from "express"
+import express from "express"
+const server = express()
+
+import cors, { CorsOptions } from "cors"
+import listEndpoints from "express-list-endpoints"
+
 import mongoose from "mongoose"
-import cors from "cors"
+mongoose.set('returnOriginal', false)
 import todoRoutes from "./routes"
 
-const app: Express = express()
+const whitelist = ["http://localhost:3000"]
+const corsOptions: CorsOptions = {
+  origin: function (requestOrigin: string | undefined, callback: (error: Error | null, success: boolean | undefined) => void) {
+    if ( (requestOrigin && whitelist.indexOf(requestOrigin) !== -1) || !requestOrigin ) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"), undefined)
+    }
+  },
+  credentials: true,
+}
+server.use(cors(corsOptions))
+// server.use(cors())
+server.use(express.json({limit:'9mb'}))
+
+server.use("/", todoRoutes)
+
 
 const PORT: string | number = process.env.PORT || 4000
-
-app.use(cors())
-app.use(todoRoutes)
-
 const uri: string = `mongodb://${process.env.MONGO_DB}/${process.env.MONGO_PROJECT}`
-const options = { useNewUrlParser: true, useUnifiedTopology: true }
-mongoose.set("useFindAndModify", false)
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,  
+}).then( () => {
+    server.listen(PORT, () => {
+        console.log(listEndpoints(server))
+        console.log("Running on port: " + PORT)
+    })
+}).catch((err) => console.log(err))
 
-mongoose
-  .connect(uri, options)
-  .then(() =>
-    app.listen(PORT, () =>
-      console.log(`Server running on http://localhost:${PORT}`)
-    )
-  )
-  .catch(error => {
-    throw error
-  })
+
+
