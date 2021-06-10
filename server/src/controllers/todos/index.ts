@@ -1,10 +1,11 @@
-import { Response, Request } from 'express';
-import { ITODO } from '../../types/todo';
-import Todo from '../../models/todo';
+import { Response, Request } from 'express'
+import { ITodo } from './../../types/todo'
+import Todo from '../../models/todo'
 
 const getTodos = async (req: Request, res: Response): Promise<void> => {
     try {
-        const todos: ITODO[] = await Todo.find()
+        console.log(req.body)
+        const todos: ITodo[] = await Todo.find()
         res.status(200).json({ todos })
     } catch (error) {
         throw error
@@ -13,20 +14,23 @@ const getTodos = async (req: Request, res: Response): Promise<void> => {
 
 const addTodo = async (req: Request, res: Response): Promise<void> => {
     try {
-        const body = req.body as Pick<ITODO, "name" | "description" | "status">
-
-        const todo: ITODO = new Todo({
+        console.log(req.body)
+        /* const { name, title, description } = req.body;
+        
+        const task = new Todo({ name, title, description });
+         const newTodo = await task.save(); */
+        
+        const body =  req.body as Pick<ITodo, 'name' | 'description' | 'status'>
+        const todo: ITodo =  new Todo({
             name: body.name,
             description: body.description,
             status: body.status,
-        })
+        }) 
 
-        const newTodo: ITODO = await todo.save()
-        const allTodos: ITODO[] = await Todo.find()
+        const newTodo: ITodo = await todo.save()
+        //const allTodos: ITodo[] = await Todo.find()
 
-        res
-            .status(201)
-            .json({ message: "Todo added", todo: newTodo, todos: allTodos})
+        res.status(201).json({ message: 'Todo added', todo: newTodo })
     } catch (error) {
         throw error
     }
@@ -38,31 +42,31 @@ const updateTodo = async (req: Request, res: Response): Promise<void> => {
             params: { id },
             body,
         } = req
-        const updateTodo: ITODO | null = await Todo.findByIdAndUpdate(
+        const updateTodo: ITodo | null = await Todo.findByIdAndUpdate(
             { _id: id },
             body
         )
-        const allTodos: ITODO[] = await Todo.find()
+        const allTodos: ITodo[] = await Todo.find()
         res.status(200).json({
-            message: "Todo Updated",
+            message: 'Todo updated',
             todo: updateTodo,
             todos: allTodos,
         })
     } catch (error) {
-        throw error        
+        throw error
     }
 }
 
 const deleteTodo = async (req: Request, res: Response): Promise<void> => {
     try {
-        const deletedTodo: ITODO | null = await Todo.findByIdAndRemove(
+        const deletedTodo: ITodo | null = await Todo.findByIdAndRemove(
             req.params.id
         )
-        const allTodos: ITODO[] = await Todo.find()
+        const allTodos: ITodo[] = await Todo.find()
         res.status(200).json({
-            message: "Todo deleted",
-            todo: deleteTodo,
-            todos: allTodos,
+            message: 'Todo deleted',
+            todo: deletedTodo,
+            todos:allTodos,
         })
     } catch (error) {
         throw error
