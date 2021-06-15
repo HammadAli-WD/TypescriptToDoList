@@ -24,7 +24,7 @@ server.use(cors(corsOptions))
 server.use(express.json({limit:'9mb'}))
 
 server.use("/", todoRoutes)
-
+//console.table(listEndpoints(server))
 
 const PORT: string | number = process.env.PORT || 4000
 const uri: string = `mongodb://${process.env.MONGO_DB}/${process.env.MONGO_PROJECT}`
