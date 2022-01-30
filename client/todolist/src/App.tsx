@@ -24,7 +24,8 @@ const App: React.FC = () => {
       //throw new Error('Error! Todo not saved')
       console.log(status)
     }
-    setTodos(data.todos)
+     setTodos(data.todos)
+     window.location.reload();
   })
   .catch((err) => console.log(err))
 }
@@ -55,7 +56,7 @@ const App: React.FC = () => {
     <main className='App'>
       <h1>My Todos</h1>
       <AddTodo saveTodo={handleSaveTodo} />
-      {todos.map((todo: ITodo) => (
+      {todos && todos.map((todo: ITodo) => (
         <TodoItem
           key={todo._id}
           updateTodo={handleUpdateTodo}
